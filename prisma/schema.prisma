@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  admin
+  member
+}
+
+enum TaskStatus {
+  pending
+  in_progress
+  completed
+}
+
+enum TaskPriority {
+  high
+  medium 
+  low
+}
+
+model User {
+
+  id String @id @default(uuid())
+  name String
+  email String
+  password String
+  role UserRole @default(member)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  tasks Task[]
+  teams_members TeamMember[]
+
+  @@map("users")
+}
+
+model Task {
+
+  id String @id @default(uuid())
+  title String
+  description String
+  status TaskStatus @default(pending)
+  priority TaskPriority 
+
+  assignedTo String @map("assigned_to")
+  user User @relation(fields: [assignedTo] , references: [id])
+
+  teamId String @map("team_id")
+  team Team @relation(fields: [teamId] , references: [id]) 
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("tasks")
+}
+
+model Team {
+  id String @id @default(uuid())
+  name String 
+  description String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  tasks Task[]
+  teams_members TeamMember[]
+
+  @@map("teams")  
+}
+
+model TeamMember {
+  id String @id @default(uuid())
+  user_id String
+  team_id String
+
+  teams Team @relation(fields: [team_id] , references: [id])
+  users User @relation(fields: [user_id] , references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("teams_members")
+}
