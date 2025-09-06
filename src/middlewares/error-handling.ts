@@ -4,7 +4,7 @@ import { ZodError } from "zod";
 
 function errorHandling(error: any , request: Request , response: Response , next: NextFunction){
     if(error instanceof AppError){
-        return response.status(error.statusCode).json({ message: "deu merda"})
+        return response.status(error.statusCode).json({ message: error.message})
     }
 
     if(error instanceof ZodError){
