@@ -9,5 +9,7 @@ const teamsRoutes = Router()
 const teamsController = new TeamsController()
 
 teamsRoutes.post("/" , ensureAutheticated , verifyUserAuthozation(["admin"]) , teamsController.create)
+teamsRoutes.get("/" , ensureAutheticated , verifyUserAuthozation(["admin"]) , teamsController.index)
+teamsRoutes.delete("/:id" , ensureAutheticated , verifyUserAuthozation(["admin"]) , teamsController.delete)
 
 export { teamsRoutes }

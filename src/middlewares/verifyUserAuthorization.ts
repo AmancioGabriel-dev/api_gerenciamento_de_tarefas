@@ -10,5 +10,7 @@ export function verifyUserAuthozation(role: string[]){
         if(!role.includes(request.user.role)){
             throw new AppError("Unauthorized , you don't have permissition to do this" , 401)
         }
+
+        return next()
     }
 }

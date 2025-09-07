@@ -59,6 +59,15 @@ class UsersController{
         try {
             const { id } = z.object({id: z.string().uuid()}).parse(request.params)
 
+            const userExists = await prisma.user.findUnique({
+                where: { id },
+                select: { id: true } // Só busca o ID para ser mais rápido
+            })
+                
+            if (!userExists) {
+                return response.status(404).json({ error: 'User not found' })
+            }
+
             await prisma.user.delete({where : { id }})
 
             return response.json({ message: "the user has been deleted"})
@@ -67,6 +76,7 @@ class UsersController{
             next(error)
         }
     }
+
 }
 
 export { UsersController }
