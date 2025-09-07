@@ -56,6 +56,59 @@ class TasksController {
             next(error)
         }
     }
+
+    async delete(request: Request , response: Response , next: NextFunction){
+        try {
+            const id = z.object({
+                id: z.string().uuid()
+            }).parse(request.params)
+
+            const task = await prisma.task.findFirst({ where: id })
+
+            if (!task) {
+                throw new AppError("task not found" , 404)
+            }
+
+            await prisma.task.delete({ where: id })
+
+            return response.json({ message: "task has been deleted"})
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async update(request: Request , response: Response , next: NextFunction){
+        try {
+            const id = z.object({
+                id: z.string().uuid()
+            }).parse(request.params)
+
+            const bodySchema = z.object({
+                status: z.enum(["in_progress" , "completed"])
+            })
+
+            const { status } = bodySchema.parse(request.body)
+
+            const task = await prisma.task.findFirst({ where: id })
+            if (!task) {
+                throw new AppError("task not found" , 404)
+            }
+
+            await prisma.task.update({
+                where: {
+                    id: task.id
+                },
+                data: {
+                    status: status
+                }
+            })
+
+            return response.json({ message: `message was changed for ${status}`})
+
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export { TasksController }

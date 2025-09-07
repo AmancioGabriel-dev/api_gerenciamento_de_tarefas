@@ -17,4 +17,17 @@ tasksRoutes.get("/:id",
     verifyUserAuthozation(["admin"]),
     tasksController.index
 )
+
+tasksRoutes.delete("/:id",
+    ensureAutheticated,
+    verifyUserAuthozation(["admin"]),
+    tasksController.delete
+)
+
+tasksRoutes.patch("/:id",
+    ensureAutheticated,
+    verifyUserAuthozation(["admin"]),
+    tasksController.update
+)
+
 export { tasksRoutes }
