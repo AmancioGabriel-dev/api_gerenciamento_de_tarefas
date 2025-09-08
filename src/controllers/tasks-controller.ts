@@ -19,6 +19,28 @@ class TasksController {
             const { title , description , status , 
                 priority , assigned_to , team_id } = bodySchema.parse(request.body)
 
+            const user = await prisma.user.findFirst({ where: {id: assigned_to}})
+            if(!user) {
+                throw new AppError("user not found" , 404)
+            }
+
+            const team = await prisma.team.findFirst({ where: { id: team_id}})
+            if(!team) {
+                throw new AppError("team not found" , 404)
+            }
+
+            const task = await prisma.task.findFirst({ where: { title }})
+            if(task) {
+                throw new AppError("task already exists" , 409)
+            }
+
+            const teamMember = await prisma.teamMember.findFirst({ where: { user_id: assigned_to ,
+                team_id: team_id
+            }})
+            if(!teamMember) {
+                throw new AppError("user is not a member of the team" , 403)
+            }
+
             await prisma.task.create({
                 data:{
                     title,
